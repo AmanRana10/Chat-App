@@ -5,6 +5,7 @@ import { useModalState } from '../../misc/custom-hooks';
 import { database, storage } from '../../misc/firebase';
 import { useProfile } from '../../context/profile.context';
 import ProfileAvatar from './ProfileAvatar';
+import { getUserUpdates } from '../../misc/helpers';
 
 const fileInputTypes = '.png, .jpeg, .jpg';
 const acceptedFileTypes = ['image/png', 'image/jpeg', 'image/pjpeg'];
@@ -60,9 +61,10 @@ const AvatarUploadBtn = () => {
 
       const downloadURL = await uploadResult.ref.getDownloadURL();
 
-      const userAvatarRef = database.ref(`/profiles/${profile.uid}`).child('avatar');
+      const updates = await getUserUpdates(profile.uid,'avatar' ,downloadURL, database);
 
-      const userAvatarSet = await userAvatarRef.set(downloadURL);
+      await database.ref().update(updates);
+      
 
       Alert.info("Avatar has been uploaded", 4000);
       setIsLoading(false);
