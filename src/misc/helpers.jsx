@@ -8,6 +8,11 @@ export const getInitials = name => {
   return splitName[0][0];
 };
 
+export const transformToArr = snapVal => {
+  return snapVal ? Object.keys(snapVal) : [];
+}
+
+
 export const transformToArray = snapVal => {
 //   console.log('snap',snapVal);
   return snapVal
