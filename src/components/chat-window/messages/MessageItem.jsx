@@ -7,10 +7,34 @@ import { auth } from '../../../misc/firebase';
 import ProfileAvatar from '../../dashboard/ProfileAvatar';
 import PresenceDot from '../../PresenceDot';
 import IconBtnControl from './IconBtnControl';
+import ImgBtnModal from './ImgBtnModal';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
 
+const renderFileMessage = file => {
+  // console.log('file', file);
+  if (file.content.includes('image')) {
+    return (
+      <div className="height-220">
+        <ImgBtnModal src={file.url} fileName={file.name} />
+      </div>
+    );
+  }
+
+  if (file.content.includes('audio')) {
+    return (
+      // eslint-disable-next-line jsx-a11y/media-has-caption
+      <audio controls>
+        <source src={file.url} type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
+    );
+  }
+
+  return <a href={file.url}>Download {file.name}</a>;
+};
+
 const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
-  const { text, createdAt, author, likes, likeCount } = message;
+  const { text, createdAt, author, file, likes, likeCount } = message;
   const isAdmin = useCurrentRoom(v => v.isAdmin);
   const admins = useCurrentRoom(v => v.admins);
   const [selfRef, isHovered] = useHover();
@@ -72,14 +96,15 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
             iconName="close"
             tooltip="Delete this message"
             onClick={() => {
-              handleDelete(message.id);
+              handleDelete(message.id, file);
             }}
           />
         )}
       </div>
 
       <div>
-        <span className="word-break-all">{text}</span>
+        {text && <span className="word-break-all">{text}</span>}
+        {file && renderFileMessage(file)}
       </div>
     </li>
   );
