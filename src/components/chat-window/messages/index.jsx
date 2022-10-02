@@ -1,34 +1,65 @@
 /* eslint-disable consistent-return */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
-import { Alert } from 'rsuite';
+import { Alert, Button } from 'rsuite';
 import { auth, database, storage } from '../../../misc/firebase';
 import { groupBy, transformToArray } from '../../../misc/helpers';
 import MessageItem from './MessageItem';
 
+const PAGE_LIMIT = 15;
+const messagesRef = database.ref('/messages');
 const Message = () => {
   const { chatId } = useParams();
   const [messages, setMessages] = useState(null);
-
+  const [limit, setLimit] = useState(PAGE_LIMIT);
   const isChatEmpty = messages && messages.length === 0;
   const canShowMessages = messages && messages.length > 0;
+  const selfRef = useRef();
 
-  useEffect(() => {
-    const messagesRef = database.ref('/messages');
-
+  const loadMessages = useCallback((limitToLast) => {
+    messagesRef.off();
+    
     messagesRef
       .orderByChild('roomId')
       .equalTo(chatId)
+      .limitToLast(limitToLast || PAGE_LIMIT)
       .on('value', snap => {
         const data = transformToArray(snap.val());
 
         setMessages(data);
       });
 
-    return () => {
-      messagesRef.off();
-    };
+      setLimit(p => p + PAGE_LIMIT);
   }, [chatId]);
+
+
+  const onLoadMore = useCallback(() => {
+    const node = selfRef.current;
+    const oldHeight = node.scrollHeight;
+
+    loadMessages(limit);
+
+    setTimeout(() => {
+      const newHeight = node.scrollHeight;
+    
+      node.scrollTop = newHeight - oldHeight;
+    
+    }, 400);
+  },[limit, loadMessages])
+
+  useEffect(() => {
+    const node = selfRef.current;
+
+    loadMessages();
+    
+    setTimeout(() => {
+      node.scrollTop = node.scrollHeight;
+    }, 400);
+
+    return () => {
+      messagesRef.off('value');
+    };
+  }, [loadMessages]);
 
   const handleAdmin = useCallback(
     async uid => {
@@ -150,7 +181,13 @@ const Message = () => {
     return item;
   };
   return (
-    <ul className="msg-list custom-scroll">
+    <ul ref={selfRef} className="msg-list custom-scroll">
+      {messages && messages.length >= PAGE_LIMIT && 
+      <li className='text-center mt-2 mb-2'>
+        <Button onClick={onLoadMore} color='green'>
+          Load More
+        </Button>
+      </li>}
       {isChatEmpty && <li> No messages yet .</li>}
       {canShowMessages && renderFunction()}
     </ul>
