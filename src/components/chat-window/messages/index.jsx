@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { Alert } from 'rsuite';
 import { auth, database, storage } from '../../../misc/firebase';
-import { transformToArray } from '../../../misc/helpers';
+import { groupBy, transformToArray } from '../../../misc/helpers';
 import MessageItem from './MessageItem';
 
 const Message = () => {
@@ -120,11 +120,21 @@ const Message = () => {
     [chatId, messages]
   );
 
-  return (
-    <ul className="msg-list custom-scroll">
-      {isChatEmpty && <li> No messages yet .</li>}
-      {canShowMessages &&
-        messages.map(msg => (
+  const renderFunction = () => {
+    const groups = groupBy(messages, item =>
+      new Date(item.createdAt).toDateString()
+    );
+
+    const item = [];
+    Object.keys(groups).forEach(date => {
+      item.push(
+        <li key={date} className="text-center mb-1 padded">
+          {date}
+        </li>
+      );
+
+      const msgGrp = groups[date].map(msg => {
+        return (
           <MessageItem
             key={msg.id}
             message={msg}
@@ -132,7 +142,17 @@ const Message = () => {
             handleLike={handleLike}
             handleDelete={handleDelete}
           />
-        ))}
+        );
+      });
+      item.push(...msgGrp);
+    });
+
+    return item;
+  };
+  return (
+    <ul className="msg-list custom-scroll">
+      {isChatEmpty && <li> No messages yet .</li>}
+      {canShowMessages && renderFunction()}
     </ul>
   );
 };
