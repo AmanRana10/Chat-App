@@ -1,7 +1,9 @@
+/* eslint-disable react/jsx-curly-brace-presence */
 /* eslint-disable consistent-return */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { Alert, Button } from 'rsuite';
+import { useMediaQuery } from '../../../misc/custom-hooks';
 import { auth, database, storage } from '../../../misc/firebase';
 import { groupBy, transformToArray } from '../../../misc/helpers';
 import MessageItem from './MessageItem';
@@ -14,6 +16,7 @@ const Message = () => {
   const [limit, setLimit] = useState(PAGE_LIMIT);
   const isChatEmpty = messages && messages.length === 0;
   const canShowMessages = messages && messages.length > 0;
+  const isMobile = useMediaQuery('(max-width : 800px)');
   const selfRef = useRef();
 
   const loadMessages = useCallback((limitToLast) => {
@@ -181,7 +184,7 @@ const Message = () => {
     return item;
   };
   return (
-    <ul ref={selfRef} className="msg-list custom-scroll">
+    <ul ref={selfRef} className="msg-list custom-scroll" style={{ backgroundImage: "url(/email-pattern.webp)" }}>
       {messages && messages.length >= PAGE_LIMIT && 
       <li className='text-center mt-2 mb-2'>
         <Button onClick={onLoadMore} color='green'>

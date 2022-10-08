@@ -102,7 +102,7 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
         )}
       </div>
 
-      <div>
+      <div className='bg-message padded d-inline-block rounded-corner'>
         {text && <span className="word-break-all">{text}</span>}
         {file && renderFileMessage(file)}
       </div>

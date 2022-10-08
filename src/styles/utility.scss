@@ -95,6 +95,10 @@ $indent_3: 15px;
   flex-direction: column;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-wrap {
   flex-wrap: wrap;
 }
@@ -129,6 +133,10 @@ $indent_3: 15px;
   border-radius: 50% !important;
 }
 
+.rounded-corner {
+  border-radius: 10%;
+}
+
 .font-bolder {
   font-weight: 500;
 }
@@ -156,6 +164,11 @@ $indent_3: 15px;
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.px-auto {
+  padding-left: auto;
+  padding-right: auto;
 }
 
 .px-0 {
