@@ -92,7 +92,7 @@ const CreateRoomBtnModal = () => {
                 componentClass="textarea"
                 rows={5}
                 name="description"
-                placeholder="Enter chat room name..."
+                placeholder="Enter chat room description..."
               />
             </FormGroup>
           </Form>
